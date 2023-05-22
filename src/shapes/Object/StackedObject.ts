@@ -63,8 +63,10 @@ export class StackedObject<
       this.group === target ||
       this.canvas === target ||
       // walk up
-      (this.parent || this.group)?.isDescendantOf(target) ||
-      false
+      (!!this.parent && this.parent.isDescendantOf(target)) ||
+      (!!this.group &&
+        this.group !== this.parent &&
+        this.group.isDescendantOf(target))
     );
   }
 
