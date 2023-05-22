@@ -658,10 +658,10 @@
     assert.equal(object.getParent(), parent);
     const activeSelection = new fabric.ActiveSelection([object], { canvas });
     assert.equal(object.group, activeSelection);
-    assert.equal(object.__owningGroup, parent);
+    assert.equal(object.parent, parent);
     assert.equal(object.canvas, canvas);
     assert.equal(object.getParent(), parent);
-    object.__owningGroup = undefined;
+    object.parent = undefined;
     assert.equal(object.getParent(), canvas);
   });
 
@@ -687,12 +687,12 @@
     assert.equal(object.getParent(), parent);
     const activeSelection = new fabric.ActiveSelection([object], { canvas });
     assert.equal(object.group, activeSelection);
-    assert.equal(object.__owningGroup, parent);
+    assert.equal(object.parent, parent);
     assert.equal(object.canvas, canvas);
     assert.ok(object.isDescendantOf(parent), 'should recognize owning group');
     assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
     assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
-    object.__owningGroup = undefined;
+    object.parent = undefined;
     assert.ok(!object.isDescendantOf(parent));
     assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
     assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
