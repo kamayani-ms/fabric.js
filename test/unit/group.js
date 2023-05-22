@@ -88,7 +88,7 @@
 
     assert.ok(typeof group.remove === 'function');
     assert.ok(rect1.group === group, 'group should be referenced');
-    assert.ok(rect1.parent === parent, 'parent should be referenced');
+    assert.ok(rect1.parent === group, 'parent should be referenced');
     group.on('object:removed', (opt) => {
       targets.push(opt.target);
     });
@@ -597,8 +597,8 @@
 
     assert.equal(firstObjInGroup.group, group);
     assert.equal(secondObjInGroup.group, group);
-    assert.equal(firstObjInGroup.parent, parent);
-    assert.equal(secondObjInGroup.parent, parent);
+    assert.equal(firstObjInGroup.parent, group);
+    assert.equal(secondObjInGroup.parent, group);
 
     group.remove(firstObjInGroup);
     assert.ok(typeof firstObjInGroup.group === 'undefined');
