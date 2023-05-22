@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): cleanup type assertions, expose `Object#parent` => rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
 - ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
 
