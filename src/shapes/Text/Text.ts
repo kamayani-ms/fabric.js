@@ -9,7 +9,6 @@ import type {
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
-import type { XY } from '../../Point';
 import type {
   Abortable,
   TCacheCanvasDimensions,
@@ -19,6 +18,7 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
+import type { TextStyleArray } from '../../util/misc/textStyles';
 import {
   hasStyleChanged,
   stylesFromArray,
@@ -103,9 +103,13 @@ interface UniqueTextProps {
 
 export interface SerializedTextProps
   extends SerializedObjectProps,
-    UniqueTextProps {}
+    UniqueTextProps {
+  styles: TextStyleArray | TextStyle;
+}
 
-export interface TextProps extends FabricObjectProps, UniqueTextProps {}
+export interface TextProps extends FabricObjectProps, UniqueTextProps {
+  styles: TextStyle;
+}
 
 /**
  * Text class
@@ -407,7 +411,7 @@ export class Text<
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 
-  constructor(text: string, options: any) {
+  constructor(text: string, options: Props = {} as Props) {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
     if (this.path) {
@@ -898,9 +902,6 @@ export class Text<
       let positionInPath = 0;
       const totalPathLength =
         path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo)!;
-      startingPoint.x += path.pathOffset.x;
-      startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
         case LEFT:
           positionInPath = reverse ? totalPathLength - width : 0;
@@ -927,7 +928,7 @@ export class Text<
         }
         // it would probably much faster to send all the grapheme position for a line
         // and calculate path position/angle at once.
-        this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint!);
+        this._setGraphemeOnPath(positionInPath, graphemeInfo);
         positionInPath += graphemeInfo.kernedWidth;
       }
     }
@@ -942,18 +943,14 @@ export class Text<
    * @param {GraphemeBBox} graphemeInfo current grapheme box information
    * @param {Object} startingPoint position of the point
    */
-  _setGraphemeOnPath(
-    positionInPath: number,
-    graphemeInfo: GraphemeBBox,
-    startingPoint: XY
-  ) {
+  _setGraphemeOnPath(positionInPath: number, graphemeInfo: GraphemeBBox) {
     const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
       path = this.path!;
 
     // we are at currentPositionOnPath. we want to know what point on the path is.
     const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo)!;
-    graphemeInfo.renderLeft = info.x - startingPoint.x;
-    graphemeInfo.renderTop = info.y - startingPoint.y;
+    graphemeInfo.renderLeft = info.x - path.pathOffset.x;
+    graphemeInfo.renderTop = info.y - path.pathOffset.y;
     graphemeInfo.angle = info.angle + (this.pathSide === RIGHT ? Math.PI : 0);
   }
 
@@ -1891,8 +1888,10 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject<T extends TProps<SerializedTextProps>>(object: T) {
-    return this._fromObject<Text>(
+  static fromObject<T extends TProps<SerializedTextProps>, S extends Text>(
+    object: T
+  ) {
+    return this._fromObject<S>(
       {
         ...object,
         styles: stylesFromArray(object.styles || {}, object.text),
