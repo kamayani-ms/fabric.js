@@ -700,6 +700,9 @@
      * @return {CanvasElement} initialized canvas element
      */
     createCanvasElement: function() {
+      if (('undefined' !== typeof WorkerGlobalScope) && ('function' === typeof importScripts)) {
+        return new OffscreenCanvas(1280, 720);
+      }
       return fabric.document.createElement('canvas');
     },
 
