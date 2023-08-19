@@ -1,3 +1,6 @@
+## Fabric Js on OffScreenCanvas
+fabric.js package with OffScreenCanvas support to run in webworker
+
 ## Fabric.js
 
 <!-- build/coverage status, climate -->
